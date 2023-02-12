@@ -5,17 +5,23 @@ import path from "path";
 import { DataSource } from "typeorm";
 import request from "supertest";
 import { AppModule } from "../../../app.module";
+import { FileStorageServiceToken, IFileStorageService } from "..";
+import { mock } from "jest-mock-extended";
 
 const feature = loadFeature(path.join(__dirname, "../create-post.feature"));
 
 defineFeature(feature, (test) => {
+  const mockedFileStorage = mock<IFileStorageService>();
   let app: INestApplication;
   let dataSource: DataSource;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(FileStorageServiceToken)
+      .useValue(mockedFileStorage)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     dataSource = await moduleFixture.get(DataSource);
@@ -34,12 +40,11 @@ defineFeature(feature, (test) => {
     when(
       /^I create a post with the title "(.*)" and recording "(.*)"$/,
       async (title, recording) => {
+        mockedFileStorage.store.mockResolvedValue("my-url");
         const response = await request(app.getHttpServer())
           .post("/posts")
-          .send({
-            title,
-            recording,
-          });
+          .field("title", title)
+          .attach("file", path.join(__dirname, recording));
 
         status = response.statusCode;
         body = response.body;

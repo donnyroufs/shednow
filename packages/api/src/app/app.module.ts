@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { CreatePostModule } from "./features/create-post/create-post.module";
+import { CreatePostModule } from "./features/create-post";
+import { PostEntity } from "./features/create-post/post.entity";
 
 const features = [CreatePostModule];
 
@@ -10,8 +11,8 @@ const features = [CreatePostModule];
     TypeOrmModule.forRoot({
       type: "postgres",
       url: "postgresql://postgres:postgres@localhost/shednow-dev",
-      autoLoadEntities: true,
       synchronize: true,
+      entities: [PostEntity],
     }),
   ],
 })
