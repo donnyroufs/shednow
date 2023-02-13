@@ -8,6 +8,9 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = "api";
   app.setGlobalPrefix(globalPrefix);
+  app.enableCors({
+    origin: "*",
+  });
 
   const config = new DocumentBuilder()
     .setTitle("shednow")

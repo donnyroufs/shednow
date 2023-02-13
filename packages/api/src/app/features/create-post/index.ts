@@ -135,7 +135,7 @@ class GCPFileStorageImpl implements IFileStorageService {
       .file(fileName.value)
       .save(file);
 
-    return "https://storage.cloud.google.com/shednow_uploads/" + fileName;
+    return "https://storage.cloud.google.com/shednow_uploads/" + fileName.value;
   }
 }
 
