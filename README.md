@@ -6,4 +6,3 @@
 
 * [ ] Implement "publish audio recording" 
 * [ ] Setup deployment and CI/CD
-

@@ -7,12 +7,14 @@
       "node"
     ],
     "emitDecoratorMetadata": true,
-    "target": "es2015"
+    "target": "es2015",
+    "resolveJsonModule": true
   },
   "exclude": [
     "jest.config.ts",
     "src/**/*.spec.ts",
-    "src/**/*.test.ts"
+    "src/**/*.test.ts",
+    "src/**/*.steps.ts"
   ],
   "include": [
     "src/**/*.ts"
