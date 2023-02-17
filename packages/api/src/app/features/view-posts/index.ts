@@ -1,5 +1,13 @@
-import { Controller, Get, Module, ParseIntPipe, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Module,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import { ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { IsAuthenticatedGuard } from "../../auth";
 import { PostEntity } from "../../core/entities/post.entity";
 
 export class PostDto {

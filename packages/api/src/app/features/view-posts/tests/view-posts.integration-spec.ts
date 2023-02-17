@@ -1,4 +1,4 @@
-import { INestApplication } from "@nestjs/common";
+import { ExecutionContext, INestApplication } from "@nestjs/common";
 import { TestingModule, Test } from "@nestjs/testing";
 import { mock } from "jest-mock-extended";
 import crypto from "crypto";
@@ -11,6 +11,7 @@ import {
 } from "../../create-post";
 import { UserFactory } from "../../../core/entities/user.entity";
 import { PostFactory } from "../../../core/entities/post.entity";
+import { IsAuthenticatedGuard } from "../../../auth";
 
 describe("view posts controller", () => {
   const mockedFileStorage = mock<IFileStorageService>();
@@ -23,6 +24,16 @@ describe("view posts controller", () => {
     })
       .overrideProvider(FileStorageServiceToken)
       .useValue(mockedFileStorage)
+      .overrideGuard(IsAuthenticatedGuard)
+      .useValue({
+        canActivate: (context: ExecutionContext) => {
+          context.switchToHttp().getRequest().user = {
+            email: "john@gmail.com",
+          };
+
+          return true;
+        },
+      })
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -37,13 +48,9 @@ describe("view posts controller", () => {
 
   describe("pagination", () => {
     test("when we have 10 posts then we have 1 page", async () => {
-      await UserFactory.createTemporaryDefaultUserAsync();
+      const { id } = await UserFactory.create("john", "johny@gmail.com").save();
       const posts = Array.from({ length: 10 }).map(() =>
-        PostFactory.create(
-          createRandomTitle(),
-          createRandomUrl(),
-          UserFactory.USER_ID
-        ).save()
+        PostFactory.create(createRandomTitle(), createRandomUrl(), id).save()
       );
       await Promise.all(posts);
 
@@ -53,13 +60,9 @@ describe("view posts controller", () => {
     });
 
     test("when we have 2 posts then we have 1 page", async () => {
-      await UserFactory.createTemporaryDefaultUserAsync();
+      const { id } = await UserFactory.create("john", "johny@gmail.com").save();
       const posts = Array.from({ length: 2 }).map(() =>
-        PostFactory.create(
-          createRandomTitle(),
-          createRandomUrl(),
-          UserFactory.USER_ID
-        ).save()
+        PostFactory.create(createRandomTitle(), createRandomUrl(), id).save()
       );
       await Promise.all(posts);
 
@@ -69,13 +72,9 @@ describe("view posts controller", () => {
     });
 
     test("when we have 11 posts then we have 2 pages", async () => {
-      await UserFactory.createTemporaryDefaultUserAsync();
+      const { id } = await UserFactory.create("john", "johny@gmail.com").save();
       const posts = Array.from({ length: 11 }).map(() =>
-        PostFactory.create(
-          createRandomTitle(),
-          createRandomUrl(),
-          UserFactory.USER_ID
-        ).save()
+        PostFactory.create(createRandomTitle(), createRandomUrl(), id).save()
       );
       await Promise.all(posts);
 
@@ -85,13 +84,9 @@ describe("view posts controller", () => {
     });
 
     test("when we have 20 posts then we have 2 pages", async () => {
-      await UserFactory.createTemporaryDefaultUserAsync();
+      const { id } = await UserFactory.create("john", "johny@gmail.com").save();
       const posts = Array.from({ length: 20 }).map(() =>
-        PostFactory.create(
-          createRandomTitle(),
-          createRandomUrl(),
-          UserFactory.USER_ID
-        ).save()
+        PostFactory.create(createRandomTitle(), createRandomUrl(), id).save()
       );
       await Promise.all(posts);
 

@@ -1,4 +1,4 @@
-import { INestApplication } from "@nestjs/common";
+import { ExecutionContext, INestApplication } from "@nestjs/common";
 import { TestingModule, Test } from "@nestjs/testing";
 import { defineFeature, loadFeature } from "jest-cucumber";
 import request from "supertest";
@@ -15,6 +15,7 @@ import {
 } from "../../create-post";
 import { PostEntity, PostFactory } from "../../../core/entities/post.entity";
 import { UserEntity, UserFactory } from "../../../core/entities/user.entity";
+import { IsAuthenticatedGuard } from "../../../auth";
 
 const feature = loadFeature(path.join(__dirname, "../view-posts.feature"));
 
@@ -29,6 +30,16 @@ defineFeature(feature, (test) => {
     })
       .overrideProvider(FileStorageServiceToken)
       .useValue(mockedFileStorage)
+      .overrideGuard(IsAuthenticatedGuard)
+      .useValue({
+        canActivate: (context: ExecutionContext) => {
+          context.switchToHttp().getRequest().user = {
+            email: "john@gmail.com",
+          };
+
+          return true;
+        },
+      })
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -70,7 +81,7 @@ defineFeature(feature, (test) => {
     };
 
     given("we have the posts", async (rows: TableRow[]) => {
-      const user = UserFactory.create("john");
+      const user = UserFactory.create("john", "john@gmail.com");
       const { id } = await UserEntity.save(user, {
         reload: true,
       });
@@ -107,7 +118,10 @@ defineFeature(feature, (test) => {
 
     given("we have the posts", async (rows: TableRow[]) => {
       for (const row of rows) {
-        const user = UserFactory.create(row.authorName);
+        const user = UserFactory.create(
+          row.authorName,
+          createRandomUserEmail()
+        );
         const { id } = await UserEntity.save(user, { reload: true });
         const post = PostFactory.create(row.title, createRandomUrl(), id);
 
@@ -133,12 +147,12 @@ defineFeature(feature, (test) => {
     given(
       /^we have "(.*)" posts and the (.*) has the title "last post"$/,
       async (amount: number, title: string) => {
-        await UserFactory.createTemporaryDefaultUserAsync();
+      const { id } = await UserFactory.create("john", "johny@gmail.com").save();
         const posts = Array.from({ length: amount }).map((_, index) =>
           PostFactory.create(
             index === amount - 1 ? title : createRandomTitle(),
             createRandomUrl(),
-            UserFactory.USER_ID,
+            id,
             index === amount - 1
               ? new Date("02-16-2023")
               : new Date("02-17-2023")
@@ -176,5 +190,9 @@ function createRandomUrl(): string {
 }
 
 function createRandomTitle(): string {
+  return crypto.randomUUID().replace("-", " ");
+}
+
+function createRandomUserEmail(): string {
   return crypto.randomUUID().replace("-", " ");
 }

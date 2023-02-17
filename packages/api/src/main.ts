@@ -1,16 +1,20 @@
+import "dotenv/config";
+
 import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 import { AppModule } from "./app/app.module";
-import { UserEntity, UserFactory } from "./app/core/entities/user.entity";
+import session from "express-session";
+import passport from "passport";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = "api";
   app.setGlobalPrefix(globalPrefix);
   app.enableCors({
-    origin: "*",
+    origin: process.env.ORIGIN_URL,
+    credentials: true,
   });
 
   const config = new DocumentBuilder()
@@ -20,7 +24,19 @@ async function bootstrap(): Promise<void> {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
 
-  await UserFactory.createTemporaryDefaultUserAsync();
+  app.use(
+    session({
+      secret: "my-secret",
+      saveUninitialized: false,
+      resave: false,
+      cookie: {
+        httpOnly: true,
+      },
+    })
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   const port = process.env.PORT || 3333;
   await app.listen(port);
