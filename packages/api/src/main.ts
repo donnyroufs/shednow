@@ -3,6 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 import { AppModule } from "./app/app.module";
+import { UserEntity, UserFactory } from "./app/core/entities/user.entity";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,8 @@ async function bootstrap(): Promise<void> {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
+
+  await UserFactory.createTemporaryDefaultUserAsync();
 
   const port = process.env.PORT || 3333;
   await app.listen(port);

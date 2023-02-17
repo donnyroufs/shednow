@@ -14,10 +14,10 @@ import {
 import { Storage } from "@google-cloud/storage";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { IsString } from "class-validator";
-import { ApiConsumes, ApiProperty } from "@nestjs/swagger";
+import { ApiConsumes, ApiProperty, ApiTags } from "@nestjs/swagger";
 
 import credentials from "./creds.json";
-import { PostEntity } from "./post.entity";
+import { PostEntity, PostFactory } from "../../core/entities/post.entity";
 
 class CreatePostRequest {
   @IsString()
@@ -69,6 +69,7 @@ export type ExpressMulter = {
 };
 
 @Controller("posts")
+@ApiTags("posts")
 export class CreatePostController {
   public constructor(
     @Inject(FileStorageServiceToken)
@@ -92,7 +93,7 @@ export class CreatePostController {
     file: ExpressMulter,
     @Body(new ValidationPipe()) data: CreatePostRequest
   ): Promise<CreatePostResponse> {
-    const userId = "123456-fake-user-id";
+    const userId = "19df2674-8c12-4269-9066-462c8ec4d8fa";
 
     try {
       const downloadUrl = await this.storeFile(data, userId, file);
@@ -120,7 +121,7 @@ export class CreatePostController {
     downloadUrl: string,
     userId: string
   ): Promise<PostEntity> {
-    const post = new PostEntity(data.title, downloadUrl, userId);
+    const post = PostFactory.create(data.title, downloadUrl, userId);
     await post.save();
     return post;
   }

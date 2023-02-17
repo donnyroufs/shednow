@@ -1,19 +1,11 @@
 import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { CreatePostModule } from "./features/create-post";
-import { PostEntity } from "./features/create-post/post.entity";
+import { ViewPostsModule } from "./features/view-posts";
+import { CoreModule } from "./core/core.module";
 
-const features = [CreatePostModule];
+const features = [CreatePostModule, ViewPostsModule];
 
 @Module({
-  imports: [
-    ...features,
-    TypeOrmModule.forRoot({
-      type: "postgres",
-      url: "postgresql://postgres:postgres@localhost/shednow-dev",
-      synchronize: true,
-      entities: [PostEntity],
-    }),
-  ],
+  imports: [...features, CoreModule],
 })
 export class AppModule {}
