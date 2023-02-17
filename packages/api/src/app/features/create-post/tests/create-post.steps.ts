@@ -7,6 +7,7 @@ import request from "supertest";
 import { AppModule } from "../../../app.module";
 import { FileStorageServiceToken, IFileStorageService } from "..";
 import { mock } from "jest-mock-extended";
+import { UserFactory } from "../../../core/entities/user.entity";
 
 const feature = loadFeature(path.join(__dirname, "../create-post.feature"));
 
@@ -31,6 +32,7 @@ defineFeature(feature, (test) => {
   beforeEach(async () => {
     await dataSource.dropDatabase();
     await dataSource.synchronize();
+    await UserFactory.createTemporaryDefaultUserAsync();
   });
 
   test("A post gets created and published", ({ when, then }) => {
