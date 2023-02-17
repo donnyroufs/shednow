@@ -54,7 +54,7 @@ export function CreatePost() {
   }
 
   return (
-    <Container color="white" bgColor="#161A22" padding="2rem">
+    <Container bgColor="#161A22" padding="2rem">
       <VStack as="form" spacing={8} onSubmit={handleSubmit(onSubmit)}>
         <FormControl>
           <FormLabel>Title</FormLabel>
