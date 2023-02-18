@@ -1,5 +1,5 @@
 import { TestingModule, Test } from "@nestjs/testing";
-import { INestApplication } from "@nestjs/common";
+import { ExecutionContext, INestApplication } from "@nestjs/common";
 import { defineFeature, loadFeature } from "jest-cucumber";
 import path from "path";
 import { DataSource } from "typeorm";
@@ -8,6 +8,7 @@ import { AppModule } from "../../../app.module";
 import { FileStorageServiceToken, IFileStorageService } from "..";
 import { mock } from "jest-mock-extended";
 import { UserFactory } from "../../../core/entities/user.entity";
+import { IsAuthenticatedGuard } from "../../../auth";
 
 const feature = loadFeature(path.join(__dirname, "../create-post.feature"));
 
@@ -22,6 +23,17 @@ defineFeature(feature, (test) => {
     })
       .overrideProvider(FileStorageServiceToken)
       .useValue(mockedFileStorage)
+      .overrideGuard(IsAuthenticatedGuard)
+      .useValue({
+        canActivate: (context: ExecutionContext) => {
+          context.switchToHttp().getRequest().user = {
+            email: "john@gmail.com",
+          };
+
+          return true;
+        },
+      })
+
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -32,7 +44,7 @@ defineFeature(feature, (test) => {
   beforeEach(async () => {
     await dataSource.dropDatabase();
     await dataSource.synchronize();
-    await UserFactory.createTemporaryDefaultUserAsync();
+    await UserFactory.create("john", "johny@gmail.com").save();
   });
 
   test("A post gets created and published", ({ when, then }) => {

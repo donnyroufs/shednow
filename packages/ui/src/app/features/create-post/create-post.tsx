@@ -11,6 +11,8 @@ import {
 import FileUpload from "./file-upload";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { axios } from "../../core/axios";
+import { useAuth } from "../../auth";
 
 type Fields = {
   title: string;
@@ -20,6 +22,7 @@ type Fields = {
 const toast = createStandaloneToast();
 
 export function CreatePost() {
+  useAuth(true);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { register, handleSubmit, control } = useForm<Fields>();
@@ -31,19 +34,16 @@ export function CreatePost() {
     formData.append("file", data.file);
 
     setIsLoading(true);
-    fetch("http://localhost:3333/api/posts", {
-      method: "POST",
-      body: formData,
-    }).then((res) => {
+
+    axios.post("/posts", formData).then((res) => {
       setIsLoading(false);
 
-      if (!res.ok) {
+      if (res.status !== 201) {
         toast.toast({
           title: "Error",
           description: "Failed to create post",
           variant: "top-accent",
           status: "error",
-          colorScheme: "blackAlpha",
           position: "top",
         });
         return;

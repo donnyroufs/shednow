@@ -8,6 +8,7 @@ import {
   ParseFilePipe,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   ValidationPipe,
 } from "@nestjs/common";
@@ -18,6 +19,8 @@ import { ApiConsumes, ApiProperty, ApiTags } from "@nestjs/swagger";
 
 import credentials from "./creds.json";
 import { PostEntity, PostFactory } from "../../core/entities/post.entity";
+import { IsAuthenticatedGuard, User } from "../../auth";
+import { UserEntity } from "../../core/entities/user.entity";
 
 class CreatePostRequest {
   @IsString()
@@ -69,6 +72,7 @@ export type ExpressMulter = {
 };
 
 @Controller("posts")
+@UseGuards(IsAuthenticatedGuard)
 @ApiTags("posts")
 export class CreatePostController {
   public constructor(
@@ -91,13 +95,12 @@ export class CreatePostController {
       })
     )
     file: ExpressMulter,
-    @Body(new ValidationPipe()) data: CreatePostRequest
+    @Body(new ValidationPipe()) data: CreatePostRequest,
+    @User() user: UserEntity
   ): Promise<CreatePostResponse> {
-    const userId = "19df2674-8c12-4269-9066-462c8ec4d8fa";
-
     try {
-      const downloadUrl = await this.storeFile(data, userId, file);
-      const post = await this.createPost(data, downloadUrl, userId);
+      const downloadUrl = await this.storeFile(data, user.id, file);
+      const post = await this.createPost(data, downloadUrl, user.id);
       return new CreatePostResponse(post.id);
     } catch (err) {
       throw new BadRequestException((err as Error).message);

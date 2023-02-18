@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./app/app";
 import CreatePost from "./app/features/create-post/create-post";
 import { Layout } from "./app/core/layout/layout";
+import { Login } from "./app/features/login";
+import { ProtectedRoute } from "./app/core/protected-route";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -20,7 +22,7 @@ const theme = extendTheme({
   styles: {
     global: () => ({
       body: {
-        bg: "#21252E",
+        bg: "#161A22",
         color: "#CBD9FF",
       },
     }),
@@ -41,10 +43,16 @@ const router = createBrowserRouter([
   {
     path: "/create-post",
     element: (
-      <Layout>
-        <CreatePost />
-      </Layout>
+      <ProtectedRoute>
+        <Layout>
+          <CreatePost />
+        </Layout>
+      </ProtectedRoute>
     ),
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
 ]);
 
@@ -52,7 +60,7 @@ root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <ChakraProvider theme={theme}>
-      <RouterProvider router={router} />
+        <RouterProvider router={router} />
       </ChakraProvider>
     </QueryClientProvider>
   </StrictMode>

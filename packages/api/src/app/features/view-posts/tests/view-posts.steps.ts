@@ -70,7 +70,7 @@ defineFeature(feature, (test) => {
     };
 
     given("we have the posts", async (rows: TableRow[]) => {
-      const user = UserFactory.create("john");
+      const user = UserFactory.create("john", "john@gmail.com");
       const { id } = await UserEntity.save(user, {
         reload: true,
       });
@@ -107,7 +107,10 @@ defineFeature(feature, (test) => {
 
     given("we have the posts", async (rows: TableRow[]) => {
       for (const row of rows) {
-        const user = UserFactory.create(row.authorName);
+        const user = UserFactory.create(
+          row.authorName,
+          createRandomUserEmail()
+        );
         const { id } = await UserEntity.save(user, { reload: true });
         const post = PostFactory.create(row.title, createRandomUrl(), id);
 
@@ -133,12 +136,15 @@ defineFeature(feature, (test) => {
     given(
       /^we have "(.*)" posts and the (.*) has the title "last post"$/,
       async (amount: number, title: string) => {
-        await UserFactory.createTemporaryDefaultUserAsync();
+        const { id } = await UserFactory.create(
+          "john",
+          "johny@gmail.com"
+        ).save();
         const posts = Array.from({ length: amount }).map((_, index) =>
           PostFactory.create(
             index === amount - 1 ? title : createRandomTitle(),
             createRandomUrl(),
-            UserFactory.USER_ID,
+            id,
             index === amount - 1
               ? new Date("02-16-2023")
               : new Date("02-17-2023")
@@ -176,5 +182,9 @@ function createRandomUrl(): string {
 }
 
 function createRandomTitle(): string {
+  return crypto.randomUUID().replace("-", " ");
+}
+
+function createRandomUserEmail(): string {
   return crypto.randomUUID().replace("-", " ");
 }

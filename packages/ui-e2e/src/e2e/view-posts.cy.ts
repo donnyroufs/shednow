@@ -1,7 +1,8 @@
 describe("view posts", () => {
   describe("we have no posts", () => {
     it("I will find nothing", () => {
-      cy.intercept("GET", "http://localhost:3333/api/posts?page=1", {
+      cy.setupAuth();
+      cy.intercept("GET", "/posts?page=1", {
         body: {
           posts: [],
           currentPage: 1,
@@ -21,7 +22,8 @@ describe("view posts", () => {
 
   describe("all users", () => {
     it("I will find 2 posts from two different authors", () => {
-      cy.intercept("GET", "http://localhost:3333/api/posts?page=1", {
+      cy.setupAuth();
+      cy.intercept("GET", "/posts?page=1", {
         body: {
           posts: [
             {
@@ -48,7 +50,8 @@ describe("view posts", () => {
 
   describe("Look through the next set of posts", () => {
     it("there is a load more button", () => {
-      cy.intercept("GET", "http://localhost:3333/api/posts?page=1", {
+      cy.setupAuth();
+      cy.intercept("GET", "/posts?page=1", {
         body: {
           posts: [
             {
@@ -66,7 +69,7 @@ describe("view posts", () => {
 
       cy.get('[data-cy="posts"]').should("contain", "Post 1");
 
-      cy.intercept("GET", "http://localhost:3333/api/posts?page=2", {
+      cy.intercept("GET", "/posts?page=2", {
         body: {
           posts: [
             {

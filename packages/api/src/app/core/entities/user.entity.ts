@@ -14,10 +14,13 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id!: string;
 
+  @Column()
+  public name!: string;
+
   @Column({
     unique: true,
   })
-  public name!: string;
+  public email!: string;
 
   @Column({
     nullable: true,
@@ -31,30 +34,17 @@ export class UserEntity extends BaseEntity {
 export class UserFactory {
   public static USER_ID = "19df2674-8c12-4269-9066-462c8ec4d8fa";
 
-  public static create(name: string): UserEntity {
+  public static create(
+    name: string,
+    email: string,
+    avatarUrl?: string
+  ): UserEntity {
     const entity = new UserEntity();
 
     entity.name = name;
+    entity.email = email;
+    entity.avatarUrl = avatarUrl;
 
     return entity;
-  }
-
-  public static async createTemporaryDefaultUserAsync(): Promise<UserEntity> {
-    const user = await UserEntity.findOne({
-      where: {
-        id: UserFactory.USER_ID,
-      },
-    });
-
-    if (!user) {
-      const user = new UserEntity();
-      user.id = UserFactory.USER_ID;
-      user.name = "default-user";
-      user.avatarUrl = "https://api.dicebear.com/5.x/personas/svg";
-      await user.save();
-      return user;
-    }
-
-    return user;
   }
 }

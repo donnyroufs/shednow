@@ -1,8 +1,7 @@
 describe("Should only have one recording", () => {
-  beforeEach(() => cy.visit("/create-post"));
-
   it("When I create a post with the title 'my post' and recording 'test.mp3' I will get a confirmation that its published", () => {
-    cy.intercept("GET", "http://localhost:3333/api/posts?page=1", {
+    cy.setupAuth();
+    cy.intercept("GET", "/posts?page=1", {
       body: {
         posts: [],
         currentPage: 1,
@@ -10,10 +9,14 @@ describe("Should only have one recording", () => {
       },
     });
 
-    cy.intercept("http://localhost:3333/api/posts", {
+    cy.visit("/");
+    cy.wait("@auth");
+
+    cy.intercept("/posts", {
       statusCode: 201,
     });
 
+    cy.get('[data-cy="navigate-create-post"]').click();
     cy.get('[data-cy="title"]').type("my post");
     cy.get('[data-cy="file"]').selectFile("test.mp3", {
       action: "select",

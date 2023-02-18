@@ -1,4 +1,4 @@
-import { INestApplication } from "@nestjs/common";
+import { ExecutionContext, INestApplication } from "@nestjs/common";
 import { TestingModule, Test } from "@nestjs/testing";
 import { DataSource } from "typeorm";
 import { AppModule } from "../../../app.module";
@@ -6,6 +6,7 @@ import request from "supertest";
 import path from "path";
 import { FileStorageServiceToken, IFileStorageService } from "..";
 import { mock } from "jest-mock-extended";
+import { IsAuthenticatedGuard } from "../../../auth";
 
 describe("create post controller (integration)", () => {
   const mockedFileStorage = mock<IFileStorageService>();
@@ -18,6 +19,16 @@ describe("create post controller (integration)", () => {
     })
       .overrideProvider(FileStorageServiceToken)
       .useValue(mockedFileStorage)
+      .overrideGuard(IsAuthenticatedGuard)
+      .useValue({
+        canActivate: (context: ExecutionContext) => {
+          context.switchToHttp().getRequest().user = {
+            email: "john@gmail.com",
+          };
+
+          return true;
+        },
+      })
       .compile();
 
     app = moduleFixture.createNestApplication();
