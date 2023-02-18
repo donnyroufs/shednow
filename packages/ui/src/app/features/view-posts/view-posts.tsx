@@ -2,6 +2,7 @@ import { Container, Text, Box, Button, List, ListItem } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Post } from "./post";
+import { axios } from "../../core/axios";
 
 type PostDto = {
   id: string;
@@ -17,8 +18,7 @@ type GetPostsResponse = {
 };
 
 async function fetchPosts(page = 1): Promise<GetPostsResponse> {
-  const res = await fetch("http://localhost:3333/api/posts?page=" + page);
-  return res.json();
+  return axios.get("/posts?page=" + page).then((res) => JSON.parse(res.data));
 }
 
 export function ViewPosts() {
