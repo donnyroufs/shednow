@@ -6,6 +6,7 @@ import {
   InputLeftElement,
   FormErrorMessage,
   Icon,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import { Control, useController } from "react-hook-form";
@@ -70,6 +71,7 @@ const FileUpload = ({ control }: Props) => {
           {value?.name ?? ""}
         </Input>
       </InputGroup>
+      <FormHelperText>A recording must not exceed the 5mb limit</FormHelperText>
       <FormErrorMessage>{invalid}</FormErrorMessage>
     </FormControl>
   );
