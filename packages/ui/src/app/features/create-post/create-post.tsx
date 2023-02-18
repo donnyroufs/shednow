@@ -45,6 +45,9 @@ export function CreatePost() {
           variant: "top-accent",
           status: "error",
           position: "top",
+          containerStyle: {
+            color: "red.800",
+          },
         });
         return;
       }

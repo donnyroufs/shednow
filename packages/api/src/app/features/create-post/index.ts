@@ -4,6 +4,7 @@ import {
   Controller,
   FileTypeValidator,
   Inject,
+  MaxFileSizeValidator,
   Module,
   ParseFilePipe,
   Post,
@@ -16,6 +17,11 @@ import { Storage } from "@google-cloud/storage";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { IsString } from "class-validator";
 import { ApiConsumes, ApiProperty, ApiTags } from "@nestjs/swagger";
+import {
+  RateLimiterModule,
+  RateLimit,
+  RateLimiterGuard,
+} from "nestjs-rate-limiter";
 
 import credentials from "./creds.json";
 import { PostEntity, PostFactory } from "../../core/entities/post.entity";
@@ -71,6 +77,15 @@ export type ExpressMulter = {
   size: number;
 };
 
+function MegabyteToByte(mb: number): number {
+  const byte = 1048576;
+  return mb * byte;
+}
+
+function minutesToSeconds(minutes: number): number {
+  return minutes * 100;
+}
+
 @Controller("posts")
 @UseGuards(IsAuthenticatedGuard)
 @ApiTags("posts")
@@ -83,11 +98,21 @@ export class CreatePostController {
   @Post()
   @ApiConsumes("multipart/form-data")
   @UseInterceptors(FileInterceptor("file"))
+  @UseGuards(RateLimiterGuard)
+  @RateLimit({
+    keyPrefix: "create-post",
+    points: 2,
+    duration: minutesToSeconds(10),
+    errorMessage: "Can only create 2 posts per 10 minutes",
+  })
   public async handle(
     @UploadedFile(
       new ParseFilePipe({
         fileIsRequired: true,
         validators: [
+          new MaxFileSizeValidator({
+            maxSize: MegabyteToByte(5),
+          }),
           new FileTypeValidator({
             fileType: "audio/mpeg",
           }),
@@ -144,6 +169,7 @@ class GCPFileStorageImpl implements IFileStorageService {
 }
 
 @Module({
+  imports: [RateLimiterModule],
   controllers: [CreatePostController],
   providers: [
     {
@@ -158,3 +184,4 @@ class GCPFileStorageImpl implements IFileStorageService {
   ],
 })
 export class CreatePostModule {}
+

@@ -6,6 +6,7 @@ import {
   InputLeftElement,
   FormErrorMessage,
   Icon,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import { Control, useController } from "react-hook-form";
@@ -59,7 +60,10 @@ const FileUpload = ({ control }: Props) => {
           border="1px solid"
           borderColor="#30353d"
           placeholder="Your recording..."
-          onClick={() => inputRef.current?.click()}
+          onClick={(e) => {
+            e.preventDefault();
+            inputRef.current?.click();
+          }}
           _hover={{
             borderColor: "#30353d",
           }}
@@ -67,6 +71,7 @@ const FileUpload = ({ control }: Props) => {
           {value?.name ?? ""}
         </Input>
       </InputGroup>
+      <FormHelperText>A recording must not exceed the 5mb limit</FormHelperText>
       <FormErrorMessage>{invalid}</FormErrorMessage>
     </FormControl>
   );
