@@ -7,6 +7,8 @@ declare global {
       GOOGLE_CALLBACK_URL: string;
       REDIRECT_URI: string;
       ORIGIN_URL: string;
+      SESSION_SECRET: string;
+      REDIS_URL: string;
     }
   }
 }
