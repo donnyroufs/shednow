@@ -59,7 +59,10 @@ const FileUpload = ({ control }: Props) => {
           border="1px solid"
           borderColor="#30353d"
           placeholder="Your recording..."
-          onClick={() => inputRef.current?.click()}
+          onClick={(e) => {
+            e.preventDefault();
+            inputRef.current?.click();
+          }}
           _hover={{
             borderColor: "#30353d",
           }}
