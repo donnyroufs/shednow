@@ -7,6 +7,8 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app/app.module";
 import session from "express-session";
 import passport from "passport";
+import createRedisStore from "connect-redis";
+import IoRedis from "ioredis";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -21,16 +23,23 @@ async function bootstrap(): Promise<void> {
     .setTitle("shednow")
     .setVersion("0")
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
 
+  const RedisStore = createRedisStore(session);
+  const redisClient = new IoRedis(process.env.REDIS_URL);
+
   app.use(
     session({
-      secret: "my-secret",
+      secret: process.env.SESSION_SECRET,
+      store: new RedisStore({ client: redisClient as any }),
       saveUninitialized: false,
       resave: false,
       cookie: {
         httpOnly: true,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
       },
     })
   );
