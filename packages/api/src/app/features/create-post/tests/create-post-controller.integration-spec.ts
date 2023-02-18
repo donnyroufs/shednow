@@ -8,6 +8,8 @@ import { FileStorageServiceToken, IFileStorageService } from "..";
 import { mock } from "jest-mock-extended";
 import { IsAuthenticatedGuard } from "../../../auth";
 
+import { RateLimiterGuard } from "nestjs-rate-limiter";
+
 describe("create post controller (integration)", () => {
   const mockedFileStorage = mock<IFileStorageService>();
   let app: INestApplication;
@@ -17,6 +19,10 @@ describe("create post controller (integration)", () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
+      .overrideGuard(RateLimiterGuard)
+      .useValue({
+        canActivate: (): boolean => true,
+      })
       .overrideProvider(FileStorageServiceToken)
       .useValue(mockedFileStorage)
       .overrideGuard(IsAuthenticatedGuard)
