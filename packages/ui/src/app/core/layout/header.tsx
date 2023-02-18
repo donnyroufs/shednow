@@ -25,6 +25,7 @@ export function Header() {
       {isAuthenticated && (
         <HStack spacing={4}>
           <Button
+            data-cy="navigate-create-post"
             display={{ base: "none", lg: "flex" }}
             as={Link}
             to="/create-post"

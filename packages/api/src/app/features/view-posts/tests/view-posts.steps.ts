@@ -1,4 +1,4 @@
-import { ExecutionContext, INestApplication } from "@nestjs/common";
+import { INestApplication } from "@nestjs/common";
 import { TestingModule, Test } from "@nestjs/testing";
 import { defineFeature, loadFeature } from "jest-cucumber";
 import request from "supertest";
@@ -15,7 +15,6 @@ import {
 } from "../../create-post";
 import { PostEntity, PostFactory } from "../../../core/entities/post.entity";
 import { UserEntity, UserFactory } from "../../../core/entities/user.entity";
-import { IsAuthenticatedGuard } from "../../../auth";
 
 const feature = loadFeature(path.join(__dirname, "../view-posts.feature"));
 
@@ -30,16 +29,6 @@ defineFeature(feature, (test) => {
     })
       .overrideProvider(FileStorageServiceToken)
       .useValue(mockedFileStorage)
-      .overrideGuard(IsAuthenticatedGuard)
-      .useValue({
-        canActivate: (context: ExecutionContext) => {
-          context.switchToHttp().getRequest().user = {
-            email: "john@gmail.com",
-          };
-
-          return true;
-        },
-      })
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -147,7 +136,10 @@ defineFeature(feature, (test) => {
     given(
       /^we have "(.*)" posts and the (.*) has the title "last post"$/,
       async (amount: number, title: string) => {
-      const { id } = await UserFactory.create("john", "johny@gmail.com").save();
+        const { id } = await UserFactory.create(
+          "john",
+          "johny@gmail.com"
+        ).save();
         const posts = Array.from({ length: amount }).map((_, index) =>
           PostFactory.create(
             index === amount - 1 ? title : createRandomTitle(),

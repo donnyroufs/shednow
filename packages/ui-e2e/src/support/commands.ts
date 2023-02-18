@@ -12,13 +12,19 @@
 declare namespace Cypress {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Chainable<Subject> {
-    login(email: string, password: string): void;
+    setupAuth(): void;
   }
 }
 //
 // -- This is a parent command --
-Cypress.Commands.add('login', (email, password) => {
-  console.log('Custom command example: Login', email, password);
+Cypress.Commands.add("setupAuth", () => {
+  cy.intercept("/auth/me", {
+    id: "7d59358b-3563-425d-b7bd-011ed82011ae",
+    name: "Donny Roufs",
+    email: "donny@gmail.com",
+    avatarUrl:
+      "https://lh3.googleusercontent.com/a/AEdFTp4DkqfKcSDYfchAPyNzZpkzN5ICUsWmVE7UvhaM9Q=s96-c",
+  }).as("auth");
 });
 //
 // -- This is a child command --
