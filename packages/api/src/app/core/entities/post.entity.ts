@@ -5,21 +5,23 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
+import { FeedbackEntity } from "./feedback.entity";
 import { UserEntity } from "./user.entity";
 
 @Entity({
   name: "Posts",
 })
+@Unique("title_author", ["title", "author"]) // TODO: write tests against unique constraint
 export class PostEntity extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id!: string;
 
-  @Column({
-    unique: true,
-  })
+  @Column()
   public title!: string;
 
   @Column({
@@ -30,6 +32,9 @@ export class PostEntity extends BaseEntity {
   @ManyToOne(() => UserEntity, (user) => user.posts)
   @JoinColumn()
   public author!: UserEntity;
+
+  @OneToMany(() => FeedbackEntity, (feedback) => feedback.post)
+  public feedback!: FeedbackEntity[];
 
   @CreateDateColumn()
   public createdAt!: Date;
