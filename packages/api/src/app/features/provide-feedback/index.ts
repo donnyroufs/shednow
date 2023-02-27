@@ -45,7 +45,7 @@ class ProvideFeedbackController {
       where: {
         slug,
         author: {
-          name: authorName,
+          displayName: authorName,
         },
       },
       relations: {
