@@ -31,7 +31,9 @@ export class PostEntity extends BaseEntity {
   })
   public url!: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.posts)
+  @ManyToOne(() => UserEntity, (user) => user.posts, {
+    nullable: false,
+  })
   @JoinColumn()
   public author!: UserEntity;
 
