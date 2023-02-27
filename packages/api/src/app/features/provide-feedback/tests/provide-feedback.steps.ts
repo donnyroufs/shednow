@@ -54,7 +54,7 @@ defineFeature(feature, (test) => {
   });
 
   test("I have not given feedback", ({ given, when, then }) => {
-    let POST_TITLE: string;
+    let POST_SLUG: string;
     let POST_AUTHOR: string;
 
     given(
@@ -65,8 +65,8 @@ defineFeature(feature, (test) => {
           reload: true,
         });
         const post = PostFactory.create(postTitle, createRandomUrl(), id);
-        await PostEntity.save(post);
-        POST_TITLE = postTitle;
+        const createdPost = await PostEntity.save(post, { reload: true });
+        POST_SLUG = createdPost.slug;
         POST_AUTHOR = user.name;
       }
     );
@@ -83,7 +83,7 @@ defineFeature(feature, (test) => {
         );
         currentUser = await UserEntity.save(user);
         const response = await request(app.getHttpServer())
-          .post(`/posts/${POST_AUTHOR}/${POST_TITLE}/feedback`)
+          .post(`/posts/${POST_AUTHOR}/${POST_SLUG}/feedback`)
           .send(new ProvideFeedbackDto(content));
 
         givenFeedback = content;
@@ -96,7 +96,7 @@ defineFeature(feature, (test) => {
       async (authorName, feedbackProvider, postTitle) => {
         const post = await dataSource.getRepository(PostEntity).findOne({
           where: {
-            title: POST_TITLE,
+            slug: POST_SLUG,
             author: {
               name: authorName,
             },
@@ -120,8 +120,9 @@ defineFeature(feature, (test) => {
   });
 
   test("I have given feedback", ({ given, when, then }) => {
-    let POST_TITLE: string;
+    let POST_SLUG: string;
     let POST_AUTHOR: string;
+    let POST_TITLE: string;
 
     given(
       /^We have a post with the title "(.*)" created by "(.*)" with feedback "(.*)" by "(.*)"$/,
@@ -142,7 +143,8 @@ defineFeature(feature, (test) => {
         feedback.content = feedbackContent;
         feedback.post = createdPost;
         await FeedbackEntity.save(feedback);
-        POST_TITLE = postTitle;
+        POST_TITLE = createdPost.title;
+        POST_SLUG = createdPost.slug;
         POST_AUTHOR = postAuthor;
       }
     );
@@ -156,7 +158,7 @@ defineFeature(feature, (test) => {
       currentUser = author!;
 
       const response = await request(app.getHttpServer())
-        .post(`/posts/${POST_AUTHOR}/${POST_TITLE}/feedback`)
+        .post(`/posts/${POST_AUTHOR}/${POST_SLUG}/feedback`)
         .send(new ProvideFeedbackDto("some feedback"));
 
       statusCode = response.status;
@@ -171,40 +173,39 @@ defineFeature(feature, (test) => {
     );
   });
 
-      test("Attempts to give feedback on their own post", ({
-        given,
-        when,
-        then,
-        pending,
-      }) => {
-        let POST_TITLE: string;
-        let statusCode: number;
+  test("Attempts to give feedback on their own post", ({
+    given,
+    when,
+    then,
+  }) => {
+    let POST_SLUG: string;
+    let statusCode: number;
 
-        given(/^"(.*)" has a post$/, async (authorName) => {
-          const user = UserFactory.create(authorName, createRandomUserEmail());
-          const { id } = await UserEntity.save(user, {
-            reload: true,
-          });
-          const post = PostFactory.create("my post", createRandomUrl(), id);
-          await PostEntity.save(post);
-          POST_TITLE = post.title;
-        });
-
-        when(/^"(.*)" tries to give feedback$/, async (authorName) => {
-          const response = await request(app.getHttpServer())
-            .post(`/posts/${authorName}/${POST_TITLE}/feedback`)
-            .send(new ProvideFeedbackDto("some content"));
-
-          statusCode = response.statusCode;
-        });
-
-        then(
-          /^"(.*)" will be told that he is not allowed to give feedback on his own post$/,
-          () => {
-            expect(statusCode).toBe(400);
-          }
-        );
+    given(/^"(.*)" has a post$/, async (authorName) => {
+      const user = UserFactory.create(authorName, createRandomUserEmail());
+      const { id } = await UserEntity.save(user, {
+        reload: true,
       });
+      const post = PostFactory.create("my post", createRandomUrl(), id);
+      const createdPost = await PostEntity.save(post, { reload: true });
+      POST_SLUG = createdPost.slug;
+    });
+
+    when(/^"(.*)" tries to give feedback$/, async (authorName) => {
+      const response = await request(app.getHttpServer())
+        .post(`/posts/${authorName}/${POST_SLUG}/feedback`)
+        .send(new ProvideFeedbackDto("some content"));
+
+      statusCode = response.statusCode;
+    });
+
+    then(
+      /^"(.*)" will be told that he is not allowed to give feedback on his own post$/,
+      () => {
+        expect(statusCode).toBe(400);
+      }
+    );
+  });
 
   afterAll(async () => {
     await dataSource.destroy();

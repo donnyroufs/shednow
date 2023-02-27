@@ -26,7 +26,7 @@ export class ProvideFeedbackDto {
   }
 }
 
-@Controller("posts/:author/:title/feedback")
+@Controller("posts/:author/:slug/feedback")
 @UseGuards(IsAuthenticatedGuard)
 class ProvideFeedbackController {
   @Post()
@@ -38,12 +38,12 @@ class ProvideFeedbackController {
     @Body() data: ProvideFeedbackDto,
     @User() user: UserEntity,
     @Param("author") authorName: string,
-    @Param("title") title: string
+    @Param("slug") slug: string
   ): Promise<void> {
     const feedback = new FeedbackEntity();
     const post = await PostEntity.findOne({
       where: {
-        title,
+        slug,
         author: {
           name: authorName,
         },
@@ -76,8 +76,8 @@ class ProvideFeedbackController {
     feedback.post = post;
     feedback.content = data.content;
 
-    await feedback.save().catch(err => {
-      throw new BadRequestException(err.message)
+    await feedback.save().catch((err) => {
+      throw new BadRequestException(err.message);
     });
   }
 }

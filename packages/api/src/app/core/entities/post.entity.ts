@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -12,6 +13,7 @@ import {
 } from "typeorm";
 import { FeedbackEntity } from "./feedback.entity";
 import { UserEntity } from "./user.entity";
+import slugify from "slugify";
 
 @Entity({
   name: "Posts",
@@ -32,6 +34,18 @@ export class PostEntity extends BaseEntity {
   @ManyToOne(() => UserEntity, (user) => user.posts)
   @JoinColumn()
   public author!: UserEntity;
+
+  @Column()
+  public slug!: string;
+
+  @BeforeInsert()
+  public setSlug(): void {
+    this.slug = slugify(this.title, {
+      lower: true,
+      trim: true,
+      replacement: "-",
+    });
+  }
 
   @OneToMany(() => FeedbackEntity, (feedback) => feedback.post)
   public feedback!: FeedbackEntity[];
