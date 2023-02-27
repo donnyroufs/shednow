@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import React, { StrictMode } from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
@@ -9,6 +9,7 @@ import CreatePost from "./app/features/create-post/create-post";
 import { Layout } from "./app/core/layout/layout";
 import { Login } from "./app/features/login";
 import { ProtectedRoute } from "./app/core/protected-route";
+import { ViewPost } from "./app/features/provide-feedback";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -22,7 +23,7 @@ const theme = extendTheme({
   styles: {
     global: () => ({
       body: {
-        bg: "#161A22",
+        bg: "#21252E",
         color: "#CBD9FF",
       },
     }),
@@ -53,6 +54,14 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/posts/:authorName/:slug",
+    element: (
+      <Layout>
+        <ViewPost />
+      </Layout>
+    ),
   },
 ]);
 

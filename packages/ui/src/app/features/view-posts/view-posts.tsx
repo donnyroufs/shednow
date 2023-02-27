@@ -9,6 +9,7 @@ type PostDto = {
   title: string;
   authorName: string;
   url: string;
+  slug: string;
 };
 
 type GetPostsResponse = {
