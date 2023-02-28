@@ -1,4 +1,5 @@
 import { Avatar, Box, Heading } from "@chakra-ui/react";
+import { useAuth } from "../../auth";
 import { PostFeedbackFooter } from "../provide-feedback";
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function Post({ title, authorName, avatarUrl, url, slug }: Props) {
+  const auth = useAuth(true);
   const to = `/posts/${authorName}/${slug}`;
 
   return (
@@ -37,7 +39,7 @@ export function Post({ title, authorName, avatarUrl, url, slug }: Props) {
       <Box w="100%" mt={4}>
         <audio src={url} controls />
       </Box>
-      <PostFeedbackFooter to={to} />
+      {auth.isAuthenticated && <PostFeedbackFooter to={to} />}
     </Box>
   );
 }
