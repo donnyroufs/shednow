@@ -29,6 +29,9 @@ describe("Provide feedback", () => {
       }).as("post");
       cy.intercept("POST", "/posts/john/post-1/feedback", {
         statusCode: 201,
+        headers: {
+          "Content-type": "application/json",
+        },
       }).as("feedback");
 
       cy.visit("/");
@@ -41,7 +44,7 @@ describe("Provide feedback", () => {
       cy.get('[data-cy="content"]').type(
         "You are rushing here, try doing this instead."
       );
-      cy.get('[data-cy="form"]').submit();
+      cy.get('[data-cy="add-feedback"]').click();
 
       cy.wait("@feedback").then((response) => {
         expect(response.response!.statusCode).to.eq(201);
@@ -84,6 +87,7 @@ describe("Provide feedback", () => {
       cy.wait("@post");
 
       cy.get('[data-cy="content"]').should("be.disabled");
+      cy.get('[data-cy="add-feedback"]').should("not.be.visible");
     });
   });
 
@@ -125,6 +129,7 @@ describe("Provide feedback", () => {
       cy.wait("@post");
 
       cy.get('[data-cy="content"]').should("not.exist");
+      cy.get('[data-cy="add-feedback"]').should("not.exist");
     });
   });
 });

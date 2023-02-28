@@ -6,7 +6,15 @@ export class PostsRepository {
     slug: string,
     data: ProvideFeedbackDto
   ): Promise<void> {
-    await axios.post(`/posts/${authorName}/${slug}/feedback`, data);
+    await axios.post(
+      `/posts/${authorName}/${slug}/feedback`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-type": "application/json",
+        },
+      }
+    );
   }
 
   public static async findOneByAuthorAndSlug(
