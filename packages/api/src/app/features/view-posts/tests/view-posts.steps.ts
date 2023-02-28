@@ -79,6 +79,7 @@ defineFeature(feature, (test) => {
           row.title,
           createRandomUrl(),
           id,
+          "goal",
           new Date(row.createdAt)
         )
       );
@@ -112,7 +113,12 @@ defineFeature(feature, (test) => {
           createRandomUserEmail()
         );
         const { id } = await UserEntity.save(user, { reload: true });
-        const post = PostFactory.create(row.title, createRandomUrl(), id);
+        const post = PostFactory.create(
+          row.title,
+          createRandomUrl(),
+          id,
+          "goal"
+        );
 
         await PostEntity.save(post);
       }
@@ -145,6 +151,7 @@ defineFeature(feature, (test) => {
             index === amount - 1 ? title : createRandomTitle(),
             createRandomUrl(),
             id,
+            "goal",
             index === amount - 1
               ? new Date("02-16-2023")
               : new Date("02-17-2023")

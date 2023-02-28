@@ -40,6 +40,9 @@ export class PostEntity extends BaseEntity {
   @Column()
   public slug!: string;
 
+  @Column({ nullable: false })
+  public goal!: string;
+
   @BeforeInsert()
   public setSlug(): void {
     this.slug = slugify(this.title, {
@@ -64,6 +67,7 @@ export class PostFactory {
     title: string,
     url: string,
     authorId: string,
+    goal: string,
     createdAt?: Date
   ): PostEntity {
     const entity = new PostEntity();
@@ -71,6 +75,7 @@ export class PostFactory {
 
     entity.title = title;
     entity.url = url;
+    entity.goal = goal;
 
     if (createdAt) {
       entity.createdAt = createdAt;
