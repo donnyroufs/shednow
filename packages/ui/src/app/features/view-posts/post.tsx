@@ -1,5 +1,5 @@
-import { Avatar, Box, Button, Heading, Link, Text } from "@chakra-ui/react";
-import { useRef } from "react";
+import { Avatar, Box, Heading } from "@chakra-ui/react";
+import { PostFeedbackFooter } from "../provide-feedback";
 
 type Props = {
   id: string;
@@ -7,23 +7,15 @@ type Props = {
   authorName: string;
   url: string;
   avatarUrl?: string;
+  slug: string;
 };
 
-export function Post({ id, title, authorName, avatarUrl, url }: Props) {
-  const ref = useRef<HTMLAudioElement>(null!);
-
-  function onPlay() {
-    if (ref.current.duration > 0 && !ref.current.paused) {
-      ref.current.pause();
-      return;
-    }
-
-    ref.current.play();
-  }
+export function Post({ title, authorName, avatarUrl, url, slug }: Props) {
+  const to = `/posts/${authorName}/${slug}`;
 
   return (
     <Box
-      bgColor="#171C25"
+      bgColor="#161A22"
       border="1px solid"
       display="flex"
       flexDir="column"
@@ -43,8 +35,9 @@ export function Post({ id, title, authorName, avatarUrl, url }: Props) {
         </Box>
       </Box>
       <Box w="100%" mt={4}>
-        <audio src={url} controls ref={ref} />
+        <audio src={url} controls />
       </Box>
+      <PostFeedbackFooter to={to} />
     </Box>
   );
 }

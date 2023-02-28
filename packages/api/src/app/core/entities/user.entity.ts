@@ -4,6 +4,7 @@ import {
   BaseEntity,
   OneToMany,
   Entity,
+  BeforeInsert,
 } from "typeorm";
 import { PostEntity } from "./post.entity";
 
@@ -14,8 +15,15 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id!: string;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   public name!: string;
+
+  @Column({
+    unique: true,
+  })
+  public displayName!: string;
 
   @Column({
     unique: true,
@@ -26,6 +34,17 @@ export class UserEntity extends BaseEntity {
     nullable: true,
   })
   public avatarUrl?: string;
+
+  @BeforeInsert()
+  public async setDisplayName(): Promise<void> {
+    const count = await UserEntity.countBy({
+      name: this.name,
+    });
+
+    const displayName = this.name.replace(/ /g, "").toLowerCase();
+
+    this.displayName = count === 0 ? displayName : displayName + count;
+  }
 
   @OneToMany(() => PostEntity, (post) => post.author)
   public posts!: PostEntity[];

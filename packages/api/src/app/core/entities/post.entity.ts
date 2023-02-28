@@ -1,25 +1,29 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
+import { FeedbackEntity } from "./feedback.entity";
 import { UserEntity } from "./user.entity";
+import slugify from "slugify";
 
 @Entity({
   name: "Posts",
 })
+@Unique("title_author", ["title", "author"]) // TODO: write tests against unique constraint
 export class PostEntity extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id!: string;
 
-  @Column({
-    unique: true,
-  })
+  @Column()
   public title!: string;
 
   @Column({
@@ -27,9 +31,26 @@ export class PostEntity extends BaseEntity {
   })
   public url!: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.posts)
+  @ManyToOne(() => UserEntity, (user) => user.posts, {
+    nullable: false,
+  })
   @JoinColumn()
   public author!: UserEntity;
+
+  @Column()
+  public slug!: string;
+
+  @BeforeInsert()
+  public setSlug(): void {
+    this.slug = slugify(this.title, {
+      lower: true,
+      trim: true,
+      replacement: "-",
+    });
+  }
+
+  @OneToMany(() => FeedbackEntity, (feedback) => feedback.post)
+  public feedback!: FeedbackEntity[];
 
   @CreateDateColumn()
   public createdAt!: Date;
