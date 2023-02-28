@@ -9,7 +9,7 @@ import CreatePost from "./app/features/create-post/create-post";
 import { Layout } from "./app/core/layout/layout";
 import { Login } from "./app/features/login";
 import { ProtectedRoute } from "./app/core/protected-route";
-import { ViewPost } from "./app/features/provide-feedback";
+import { ViewPost } from "./app/features/view-post";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

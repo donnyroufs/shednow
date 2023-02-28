@@ -29,6 +29,22 @@ class ProvideFeedbackDto {
   public constructor(public readonly content: string) {}
 }
 
+class FeedbackDto {
+  public readonly content: string;
+  public readonly authorName: string;
+  public readonly authorAvatar?: string;
+
+  public constructor(
+    content: string,
+    authorName: string,
+    authorAvatar?: string
+  ) {
+    this.content = content;
+    this.authorName = authorName;
+    this.authorAvatar = authorAvatar;
+  }
+}
+
 export class PostDetailsDto {
   public readonly id: string;
   public readonly title: string;
@@ -36,6 +52,9 @@ export class PostDetailsDto {
   public readonly url: string;
   public readonly hasProvidedFeedback: boolean;
   public readonly isMyPost: boolean;
+  public readonly authorName: string;
+  public readonly authorAvatar?: string;
+  public readonly feedback: FeedbackDto[];
 
   public constructor(data: PostDetailsDto) {
     this.id = data.id;
@@ -44,5 +63,8 @@ export class PostDetailsDto {
     this.url = data.url;
     this.hasProvidedFeedback = data.hasProvidedFeedback;
     this.isMyPost = data.isMyPost;
+    this.authorName = data.authorName;
+    this.feedback = data.feedback;
+    this.authorAvatar = data.authorAvatar;
   }
 }

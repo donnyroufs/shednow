@@ -7,6 +7,7 @@ import { LoginWithGoogleModule } from "./features/login-with-google";
 import { LogoutModule } from "./features/logout";
 import { GetMeModule } from "./features/get-me";
 import { ProvideFeedbackModule } from "./features/provide-feedback";
+import { ViewPostModule } from "./features/view-post";
 
 const features = [
   CreatePostModule,
@@ -15,6 +16,7 @@ const features = [
   LogoutModule,
   GetMeModule,
   ProvideFeedbackModule,
+  ViewPostModule,
 ];
 
 @Module({

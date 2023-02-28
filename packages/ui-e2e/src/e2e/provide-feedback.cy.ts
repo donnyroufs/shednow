@@ -24,6 +24,7 @@ describe("Provide feedback", () => {
           url: "url",
           hasProvidedFeedback: false,
           isMyPost: false,
+          feedback: [],
         },
       }).as("post");
       cy.intercept("POST", "/posts/john/post-1/feedback", {
@@ -71,6 +72,7 @@ describe("Provide feedback", () => {
           url: "url",
           isMyPost: false,
           hasProvidedFeedback: true,
+          feedback: [],
         },
       }).as("post");
 
@@ -111,6 +113,7 @@ describe("Provide feedback", () => {
           url: "url",
           hasProvidedFeedback: false,
           isMyPost: true,
+          feedback: [],
         },
       }).as("post");
 
