@@ -7,7 +7,7 @@ import request from "supertest";
 import { AppModule } from "../../../app.module";
 import { FileStorageServiceToken, IFileStorageService } from "..";
 import { mock } from "jest-mock-extended";
-import { UserFactory } from "../../../core/entities/user.entity";
+import { UserEntity, UserFactory } from "../../../core/entities/user.entity";
 import { IsAuthenticatedGuard } from "../../../auth";
 
 const feature = loadFeature(path.join(__dirname, "../create-post.feature"));
@@ -16,6 +16,7 @@ defineFeature(feature, (test) => {
   const mockedFileStorage = mock<IFileStorageService>();
   let app: INestApplication;
   let dataSource: DataSource;
+  let USER: UserEntity;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -26,9 +27,7 @@ defineFeature(feature, (test) => {
       .overrideGuard(IsAuthenticatedGuard)
       .useValue({
         canActivate: (context: ExecutionContext) => {
-          context.switchToHttp().getRequest().user = {
-            email: "john@gmail.com",
-          };
+          context.switchToHttp().getRequest().user = USER;
 
           return true;
         },
@@ -44,7 +43,9 @@ defineFeature(feature, (test) => {
   beforeEach(async () => {
     await dataSource.dropDatabase();
     await dataSource.synchronize();
-    await UserFactory.create("john", "johny@gmail.com").save();
+    const user = UserFactory.create("john", "johny@gmail.com");
+    const createdUser = await user.save({ reload: true });
+    USER = createdUser;
   });
 
   test("A post gets created and published", ({ when, then }) => {

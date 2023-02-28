@@ -61,13 +61,13 @@ defineFeature(feature, (test) => {
       /^We have a post with the title "(.*)" created by "(.*)" with no feedback$/,
       async (postTitle: string, authorName: string) => {
         const user = UserFactory.create(authorName, createRandomUserEmail());
-        const { id } = await UserEntity.save(user, {
+        const { id, displayName } = await UserEntity.save(user, {
           reload: true,
         });
         const post = PostFactory.create(postTitle, createRandomUrl(), id);
         const createdPost = await PostEntity.save(post, { reload: true });
         POST_SLUG = createdPost.slug;
-        POST_AUTHOR = user.name;
+        POST_AUTHOR = displayName;
       }
     );
 
@@ -126,9 +126,14 @@ defineFeature(feature, (test) => {
 
     given(
       /^We have a post with the title "(.*)" created by "(.*)" with feedback "(.*)" by "(.*)"$/,
-      async (postTitle, postAuthor, feedbackContent, feedbackProvider) => {
+      async (
+        postTitle: string,
+        postAuthor: string,
+        feedbackContent: string,
+        feedbackProvider: string
+      ) => {
         const user = UserFactory.create(postAuthor, createRandomUserEmail());
-        const { id } = await UserEntity.save(user, {
+        const { id, displayName } = await UserEntity.save(user, {
           reload: true,
         });
         const post = PostFactory.create(postTitle, createRandomUrl(), id);
@@ -145,7 +150,7 @@ defineFeature(feature, (test) => {
         await FeedbackEntity.save(feedback);
         POST_TITLE = createdPost.title;
         POST_SLUG = createdPost.slug;
-        POST_AUTHOR = postAuthor;
+        POST_AUTHOR = displayName;
       }
     );
 
@@ -179,21 +184,23 @@ defineFeature(feature, (test) => {
     then,
   }) => {
     let POST_SLUG: string;
+    let POST_AUTHOR: string;
     let statusCode: number;
 
     given(/^"(.*)" has a post$/, async (authorName) => {
       const user = UserFactory.create(authorName, createRandomUserEmail());
-      const { id } = await UserEntity.save(user, {
+      const { id, displayName } = await UserEntity.save(user, {
         reload: true,
       });
       const post = PostFactory.create("my post", createRandomUrl(), id);
       const createdPost = await PostEntity.save(post, { reload: true });
       POST_SLUG = createdPost.slug;
+      POST_AUTHOR = displayName;
     });
 
     when(/^"(.*)" tries to give feedback$/, async (authorName) => {
       const response = await request(app.getHttpServer())
-        .post(`/posts/${authorName}/${POST_SLUG}/feedback`)
+        .post(`/posts/${POST_AUTHOR}/${POST_SLUG}/feedback`)
         .send(new ProvideFeedbackDto("some content"));
 
       statusCode = response.statusCode;
