@@ -1,5 +1,5 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import {
   Avatar,
@@ -9,6 +9,7 @@ import {
   Textarea,
   VStack,
   Text,
+  Button,
 } from "@chakra-ui/react";
 import React from "react";
 
@@ -21,6 +22,7 @@ type Fields = {
 
 export function ViewPost() {
   useAuth(true);
+  const client = useQueryClient();
   const navigate = useNavigate();
   const params = useParams<{ slug: string; authorName: string }>();
   const enabled = params.slug != null && params.authorName != null;
@@ -33,12 +35,16 @@ export function ViewPost() {
       retry: false,
     }
   );
+
   const { register, handleSubmit } = useForm<Fields>();
 
   async function onSubmit(data: Fields) {
     await PostsRepository.provideFeedback(params.authorName!, params.slug!, {
       content: data.content,
     });
+
+    // this is not covered by tests
+    await client.invalidateQueries(["post", params.authorName, params.slug]);
   }
 
   if (query.isLoading || !enabled) {
@@ -72,21 +78,41 @@ export function ViewPost() {
         data-cy="form"
       >
         {!post.isMyPost && (
-          <Textarea
-            disabled={post.hasProvidedFeedback}
-            placeholder={
-              post.hasProvidedFeedback
-                ? "You have already provided feedback!"
-                : "Provide some valuable feedback..."
-            }
-            data-cy="content"
-            border="1px solid #2E3542"
-            resize="none"
-            p={4}
-            h="175px"
-            {...register("content", { required: true })}
-            bgColor="#161A22"
-          />
+          <Box w="full" position="relative">
+            <Textarea
+              disabled={post.hasProvidedFeedback}
+              placeholder={
+                post.hasProvidedFeedback
+                  ? "You have already provided feedback!"
+                  : "Provide some valuable feedback..."
+              }
+              data-cy="content"
+              border="1px solid #2E3542"
+              resize="none"
+              p={4}
+              h="175px"
+              {...register("content", { required: true })}
+              bgColor="#161A22"
+            />
+
+            <Button
+              display={post.hasProvidedFeedback ? "none" : "block"}
+              type="submit"
+              data-cy="add-feedback"
+              position="absolute"
+              bgColor="#1C2029"
+              textDecoration="none"
+              color="#5E6579"
+              _hover={{
+                bgColor: "#1C202999",
+              }}
+              bottom="16px"
+              right="16px"
+              zIndex={100}
+            >
+              Add Feedback
+            </Button>
+          </Box>
         )}
         {post.feedback.map((feedback) => (
           <Box
