@@ -6,17 +6,19 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Textarea,
   VStack,
 } from "@chakra-ui/react";
 import FileUpload from "./file-upload";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { axios } from "../../core/axios";
 import { useAuth } from "../../auth";
+import { PostsRepository } from "../../core/repositories/posts.repository";
 
 type Fields = {
   title: string;
   file: File;
+  goal: string;
 };
 
 const toast = createStandaloneToast();
@@ -28,32 +30,29 @@ export function CreatePost() {
   const { register, handleSubmit, control } = useForm<Fields>();
 
   function onSubmit(data: Fields) {
-    const formData = new FormData();
-
-    formData.append("title", data.title);
-    formData.append("file", data.file);
-
     setIsLoading(true);
 
-    axios.post("/posts", formData).then((res) => {
-      setIsLoading(false);
+    PostsRepository.create(data)
+      .then((res) => {
+        if (res.status !== 201) {
+          toast.toast({
+            title: "Error",
+            description: "Failed to create post",
+            variant: "top-accent",
+            status: "error",
+            position: "top",
+            containerStyle: {
+              color: "red.800",
+            },
+          });
+          return;
+        }
 
-      if (res.status !== 201) {
-        toast.toast({
-          title: "Error",
-          description: "Failed to create post",
-          variant: "top-accent",
-          status: "error",
-          position: "top",
-          containerStyle: {
-            color: "red.800",
-          },
-        });
-        return;
-      }
-
-      navigate("/");
-    });
+        navigate("/");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
@@ -71,6 +70,19 @@ export function CreatePost() {
               borderColor: "#30353d",
             }}
             {...register("title", { required: true })}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Goal</FormLabel>
+          <Textarea
+            data-cy="goal"
+            bgColor="#252931"
+            border="1px solid"
+            borderColor="#30353d"
+            _hover={{
+              borderColor: "#30353d",
+            }}
+            {...register("goal", { required: true })}
           />
         </FormControl>
         <FileUpload control={control} />

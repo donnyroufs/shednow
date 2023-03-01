@@ -18,6 +18,7 @@ describe("Should only have one recording", () => {
 
     cy.get('[data-cy="navigate-create-post"]').click();
     cy.get('[data-cy="title"]').type("my post");
+    cy.get('[data-cy="goal"]').type("my goal");
     cy.get('[data-cy="file"]').selectFile("test.mp3", {
       action: "select",
       force: true,

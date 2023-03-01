@@ -62,6 +62,7 @@ describe("View Post", () => {
         hasProvidedFeedback: false,
         isMyPost: true,
         feedback: [],
+        goal: "my goal",
       },
     }).as("post");
 
@@ -73,5 +74,6 @@ describe("View Post", () => {
     cy.wait("@post");
 
     cy.get('[data-cy="feedback-message"]').should("contain.text", "You");
+    cy.get('[data-cy="goal"]').should("contain.text", "my goal");
   });
 });
