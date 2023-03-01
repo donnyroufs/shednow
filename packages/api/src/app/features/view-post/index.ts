@@ -30,6 +30,8 @@ export class PostDetailsDto {
   public readonly authorAvatar?: string;
   @ApiProperty()
   public readonly feedback: FeedbackDto[];
+  @ApiProperty()
+  public readonly goal: string;
 
   public constructor(data: PostDetailsDto) {
     this.id = data.id;
@@ -41,6 +43,7 @@ export class PostDetailsDto {
     this.authorName = data.authorName;
     this.feedback = data.feedback;
     this.authorAvatar = data.authorAvatar;
+    this.goal = data.goal;
   }
 }
 
@@ -100,6 +103,7 @@ export class ViewPostController {
       url: post.url,
       slug: post.slug,
       title: post.title,
+      goal: post.goal,
       authorName: post.author.displayName,
       authorAvatar: post.author.avatarUrl,
       feedback: post.feedback.map(

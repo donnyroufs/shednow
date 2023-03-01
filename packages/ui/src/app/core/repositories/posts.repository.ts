@@ -1,4 +1,5 @@
 import { axios } from "../axios";
+import { AxiosResponse } from "axios";
 
 export class PostsRepository {
   public static async provideFeedback(
@@ -30,6 +31,16 @@ export class PostsRepository {
 
         return new PostDetailsDto(JSON.parse(data as any));
       });
+  }
+
+  public static create(data: CreatePostDto): Promise<AxiosResponse> {
+    const formData = new FormData();
+
+    formData.append("title", data.title);
+    formData.append("goal", data.goal);
+    formData.append("file", data.file);
+
+    return axios.post("/posts", formData);
   }
 }
 
@@ -63,6 +74,7 @@ export class PostDetailsDto {
   public readonly authorName: string;
   public readonly authorAvatar?: string;
   public readonly feedback: FeedbackDto[];
+  public readonly goal: string;
 
   public constructor(data: PostDetailsDto) {
     this.id = data.id;
@@ -74,5 +86,14 @@ export class PostDetailsDto {
     this.authorName = data.authorName;
     this.feedback = data.feedback;
     this.authorAvatar = data.authorAvatar;
+    this.goal = data.goal;
   }
+}
+
+class CreatePostDto {
+  public constructor(
+    public readonly title: string,
+    public readonly goal: string,
+    public readonly file: File
+  ) {}
 }

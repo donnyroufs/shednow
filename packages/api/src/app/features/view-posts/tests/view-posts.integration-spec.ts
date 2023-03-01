@@ -39,7 +39,12 @@ describe("view posts controller", () => {
     test("when we have 10 posts then we have 1 page", async () => {
       const { id } = await UserFactory.create("john", "johny@gmail.com").save();
       const posts = Array.from({ length: 10 }).map(() =>
-        PostFactory.create(createRandomTitle(), createRandomUrl(), id).save()
+        PostFactory.create(
+          createRandomTitle(),
+          createRandomUrl(),
+          id,
+          "goal"
+        ).save()
       );
       await Promise.all(posts);
 
@@ -51,7 +56,12 @@ describe("view posts controller", () => {
     test("when we have 2 posts then we have 1 page", async () => {
       const { id } = await UserFactory.create("john", "johny@gmail.com").save();
       const posts = Array.from({ length: 2 }).map(() =>
-        PostFactory.create(createRandomTitle(), createRandomUrl(), id).save()
+        PostFactory.create(
+          createRandomTitle(),
+          createRandomUrl(),
+          id,
+          "goal"
+        ).save()
       );
       await Promise.all(posts);
 
@@ -63,7 +73,12 @@ describe("view posts controller", () => {
     test("when we have 11 posts then we have 2 pages", async () => {
       const { id } = await UserFactory.create("john", "johny@gmail.com").save();
       const posts = Array.from({ length: 11 }).map(() =>
-        PostFactory.create(createRandomTitle(), createRandomUrl(), id).save()
+        PostFactory.create(
+          createRandomTitle(),
+          createRandomUrl(),
+          id,
+          "goal"
+        ).save()
       );
       await Promise.all(posts);
 
@@ -75,7 +90,12 @@ describe("view posts controller", () => {
     test("when we have 20 posts then we have 2 pages", async () => {
       const { id } = await UserFactory.create("john", "johny@gmail.com").save();
       const posts = Array.from({ length: 20 }).map(() =>
-        PostFactory.create(createRandomTitle(), createRandomUrl(), id).save()
+        PostFactory.create(
+          createRandomTitle(),
+          createRandomUrl(),
+          id,
+          "goal"
+        ).save()
       );
       await Promise.all(posts);
 

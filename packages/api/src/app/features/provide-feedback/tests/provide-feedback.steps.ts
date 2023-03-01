@@ -64,7 +64,12 @@ defineFeature(feature, (test) => {
         const { id, displayName } = await UserEntity.save(user, {
           reload: true,
         });
-        const post = PostFactory.create(postTitle, createRandomUrl(), id);
+        const post = PostFactory.create(
+          postTitle,
+          createRandomUrl(),
+          id,
+          "goal"
+        );
         const createdPost = await PostEntity.save(post, { reload: true });
         POST_SLUG = createdPost.slug;
         POST_AUTHOR = displayName;
@@ -136,7 +141,12 @@ defineFeature(feature, (test) => {
         const { id, displayName } = await UserEntity.save(user, {
           reload: true,
         });
-        const post = PostFactory.create(postTitle, createRandomUrl(), id);
+        const post = PostFactory.create(
+          postTitle,
+          createRandomUrl(),
+          id,
+          "goal"
+        );
         const createdPost = await PostEntity.save(post, { reload: true });
         const feedback = new FeedbackEntity();
         const author = UserFactory.create(
@@ -192,7 +202,7 @@ defineFeature(feature, (test) => {
       const { id, displayName } = await UserEntity.save(user, {
         reload: true,
       });
-      const post = PostFactory.create("my post", createRandomUrl(), id);
+      const post = PostFactory.create("my post", createRandomUrl(), id, "goal");
       const createdPost = await PostEntity.save(post, { reload: true });
       POST_SLUG = createdPost.slug;
       POST_AUTHOR = displayName;

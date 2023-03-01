@@ -36,7 +36,7 @@ export function ViewPost() {
     }
   );
 
-  const { register, handleSubmit } = useForm<Fields>();
+  const { register, handleSubmit, reset } = useForm<Fields>();
 
   async function onSubmit(data: Fields) {
     await PostsRepository.provideFeedback(params.authorName!, params.slug!, {
@@ -44,6 +44,7 @@ export function ViewPost() {
     });
 
     // this is not covered by tests
+    reset();
     await client.invalidateQueries(["post", params.authorName, params.slug]);
   }
 
@@ -66,6 +67,12 @@ export function ViewPost() {
         <Heading color="#E08F30" textTransform="capitalize" ml={8}>
           {post.title}
         </Heading>
+      </Box>
+      <Box mt={8}>
+        <Heading as="h3" fontSize="xl">
+          {post.isMyPost ? "My Goal" : "Their Goal"}
+        </Heading>
+        <Text data-cy="goal">{post.goal}</Text>
       </Box>
       <Box mt={8}>
         <audio src={post.url} controls />
@@ -121,6 +128,7 @@ export function ViewPost() {
             color="#5E6579"
             w="100%"
             p={8}
+            key={feedback.content + feedback.authorName}
             lineHeight={1.65}
           >
             <Avatar src={feedback.authorAvatar} />

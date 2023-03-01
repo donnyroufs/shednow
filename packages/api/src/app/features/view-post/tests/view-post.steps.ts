@@ -67,7 +67,8 @@ defineFeature(feature, (test) => {
         const post = PostFactory.create(
           postTitle,
           createRandomUrl(),
-          CREATED_USER.id
+          CREATED_USER.id,
+          "goal"
         );
         const createdPost = await PostEntity.save(post, { reload: true });
         POST_ID = createdPost.id;
@@ -121,7 +122,8 @@ defineFeature(feature, (test) => {
         const post = PostFactory.create(
           postTitle,
           createRandomUrl(),
-          createdUser.id
+          createdUser.id,
+          "goal"
         );
         const createdPost = await PostEntity.save(post, { reload: true });
         POST_ID = createdPost.id;

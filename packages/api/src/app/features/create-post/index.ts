@@ -36,6 +36,10 @@ class CreatePostRequest {
   })
   public readonly title!: string;
 
+  @IsString()
+  @ApiProperty()
+  public readonly goal!: string;
+
   // Required for open api spec
   @ApiProperty({ type: "file", name: "file" })
   private _file?: any;
@@ -149,7 +153,7 @@ export class CreatePostController {
     downloadUrl: string,
     userId: string
   ): Promise<PostEntity> {
-    const post = PostFactory.create(data.title, downloadUrl, userId);
+    const post = PostFactory.create(data.title, downloadUrl, userId, data.goal);
     await post.save();
     return post;
   }
