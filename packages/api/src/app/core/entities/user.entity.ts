@@ -16,7 +16,7 @@ export class UserEntity extends BaseEntity {
   public id!: string;
 
   @Column({
-    unique: true,
+    unique: false,
   })
   public name!: string;
 
