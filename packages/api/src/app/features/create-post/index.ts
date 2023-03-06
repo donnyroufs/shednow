@@ -23,7 +23,6 @@ import {
   RateLimiterGuard,
 } from "nestjs-rate-limiter";
 
-import credentials from "./creds.json";
 import { PostEntity, PostFactory } from "../../core/entities/post.entity";
 import { IsAuthenticatedGuard, User } from "../../auth";
 import { UserEntity } from "../../core/entities/user.entity";
@@ -172,6 +171,12 @@ class GCPFileStorageImpl implements IFileStorageService {
   }
 }
 
+const creds = Buffer.from(
+  // @ts-ignore
+  process.env.SERVICE_ACCOUNT,
+  "base64"
+).toString("utf-8");
+
 @Module({
   imports: [RateLimiterModule],
   controllers: [CreatePostController],
@@ -181,7 +186,7 @@ class GCPFileStorageImpl implements IFileStorageService {
       useFactory: (): IFileStorageService =>
         new GCPFileStorageImpl(
           new Storage({
-            credentials,
+            credentials: JSON.parse(creds),
           })
         ),
     },

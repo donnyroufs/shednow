@@ -9,6 +9,8 @@ export function Login() {
     return <Navigate to="/" replace />;
   }
 
+  const loginUrl = process.env.NX_API_URL + "/auth/google";
+
   return (
     <Box display="flex">
       <Box display="flex" flex={2} justifyContent="center" alignItems="center">
@@ -29,7 +31,7 @@ export function Login() {
           <Box>
             <Button
               as={Link}
-              href="http://localhost:3333/api/auth/google"
+              href={loginUrl}
               variant="outline"
               bgColor="#1C2029"
               border="1px solid #252931"

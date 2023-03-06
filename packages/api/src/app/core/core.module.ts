@@ -8,9 +8,13 @@ import { UserEntity } from "./entities/user.entity";
   imports: [
     TypeOrmModule.forRoot({
       type: "postgres",
-      url: "postgresql://postgres:postgres@localhost/shednow-dev",
+      url: process.env.DATABASE_URL,
       synchronize: true,
       entities: [PostEntity, UserEntity, FeedbackEntity],
+      ssl:
+        process.env.NODE_ENV === "production"
+          ? { rejectUnauthorized: false }
+          : false,
     }),
   ],
 })

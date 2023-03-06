@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: shednow-api
+    env: docker
+    dockerfilePath: ./packages/api/Dockerfile
+    region: frankfurt
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shednow-db
+          property: connectionString
+      - key: REDIS_URL 
+        fromService:
+          type: redis
+          name: redis
+          property: connectionString
+    plan: starter
+    branch: main
+  - type: web
+    name: shednow-ui
+    plan: starter
+    env: static
+    buildCommand: yarn nx build ui
+    staticPublishPath: ./dist/packages/ui
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: sameorigin
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+  - type: redis
+    name: redis
+    ipAllowList: []
+    region: frankfurt 
+    plan: starter 
+databases:
+  - name: shednow-db
+    databaseName: shednow
+    region: frankfurt
+    ipAllowList: []

@@ -3,6 +3,7 @@ import "dotenv/config";
 import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { NestExpressApplication } from "@nestjs/platform-express";
 
 import { AppModule } from "./app/app.module";
 import session from "express-session";
@@ -11,13 +12,14 @@ import createRedisStore from "connect-redis";
 import IoRedis from "ioredis";
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const globalPrefix = "api";
   app.setGlobalPrefix(globalPrefix);
   app.enableCors({
     origin: process.env.ORIGIN_URL,
     credentials: true,
   });
+  app.set("trust proxy", 1);
 
   const config = new DocumentBuilder()
     .setTitle("shednow")
@@ -40,6 +42,7 @@ async function bootstrap(): Promise<void> {
         httpOnly: true,
         sameSite: "strict",
         secure: process.env.NODE_ENV === "production",
+        domain: process.env.DOMAIN,
       },
     })
   );
